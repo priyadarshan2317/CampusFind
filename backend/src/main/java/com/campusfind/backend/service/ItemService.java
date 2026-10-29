@@ -13,6 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.campusfind.backend.dto.StatsResponse;
 
 import java.util.List;
 
@@ -111,6 +112,48 @@ public class ItemService {
         return toResponse(itemRepository.save(item));
     }
 
+    // ---------- admin methods ----------
+
+    @Transactional(readOnly = true)
+    public List<ItemResponse> pendingItems() {
+        return itemRepository.findByStatusOrderByCreatedAtAsc(ItemStatus.PENDING)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional
+    public ItemResponse approve(Long id) {
+        Item item = findItem(id);
+        if (item.getStatus() != ItemStatus.PENDING) {
+            throw new IllegalArgumentException("Only pending items can be approved");
+        }
+        item.setStatus(ItemStatus.APPROVED);
+        return toResponse(itemRepository.save(item));
+    }
+
+    @Transactional
+    public ItemResponse reject(Long id) {
+        Item item = findItem(id);
+        if (item.getStatus() != ItemStatus.PENDING) {
+            throw new IllegalArgumentException("Only pending items can be rejected");
+        }
+        item.setStatus(ItemStatus.REJECTED);
+        return toResponse(itemRepository.save(item));
+    }
+
+    @Transactional(readOnly = true)
+    public StatsResponse stats() {
+        return new StatsResponse(
+                itemRepository.count(),
+                itemRepository.countByStatus(ItemStatus.PENDING),
+                itemRepository.countByStatus(ItemStatus.APPROVED),
+                itemRepository.countByStatus(ItemStatus.CLAIMED),
+                itemRepository.countByStatus(ItemStatus.REJECTED),
+                itemRepository.countByType(ItemType.LOST),
+                itemRepository.countByType(ItemType.FOUND),
+                userRepository.count());
+    }
     // ---------- helper methods ----------
 
     private Item findItem(Long id) {
@@ -135,6 +178,7 @@ public class ItemService {
         item.setLocation(request.location().trim());
         item.setDateReported(request.dateReported());
         item.setImageUrl(request.imageUrl());
+        
     }
 
     private ItemResponse toResponse(Item item) {
