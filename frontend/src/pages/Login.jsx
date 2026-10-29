@@ -1,14 +1,20 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { getErrorMessage } from '../utils/errors'
+import AuthCard from '../components/AuthCard'
+import Field from '../components/Field'
 
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from || '/'
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [show, setShow] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -18,7 +24,7 @@ export default function Login() {
     setLoading(true)
     try {
       await login(email, password)
-      navigate('/')
+      navigate(from, { replace: true })
     } catch (err) {
       setError(getErrorMessage(err))
     } finally {
@@ -27,54 +33,65 @@ export default function Login() {
   }
 
   return (
-    <div className="mx-auto max-w-md rounded-xl bg-white p-8 shadow-sm">
-      <h1 className="text-2xl font-bold">Login</h1>
-      <p className="mt-1 text-sm text-slate-500">Welcome back to CampusFind</p>
-
+    <AuthCard
+      title="Welcome back"
+      subtitle="Log in to contact finders and post your own items."
+      footer={
+        <>
+          New to CampusFind?{' '}
+          <Link to="/register" className="font-semibold text-found hover:underline">
+            Create an account
+          </Link>
+        </>
+      }
+    >
       {error && (
-        <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" className="mb-4 rounded-xl bg-lost-soft px-4 py-3 text-sm text-lost">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500"
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Field
+          label="Email"
+          icon={Mail}
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@college.edu"
+          autoComplete="email"
+          required
+        />
 
-        <div>
-          <label className="mb-1 block text-sm font-medium">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500"
-          />
-        </div>
+        <Field
+          label="Password"
+          icon={Lock}
+          type={show ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
+          required
+          right={
+            <button
+              type="button"
+              onClick={() => setShow(!show)}
+              aria-label={show ? 'Hide password' : 'Show password'}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-ink-soft transition hover:text-ink"
+            >
+              {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          }
+        />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-indigo-600 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-ink py-3 font-semibold text-white transition hover:bg-found disabled:opacity-60"
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading && <Loader2 className="size-4 animate-spin" />}
+          {loading ? 'Logging in' : 'Log in'}
         </button>
       </form>
-
-      <p className="mt-4 text-center text-sm text-slate-600">
-        New here?{' '}
-        <Link to="/register" className="font-medium text-indigo-600 hover:underline">
-          Create an account
-        </Link>
-      </p>
-    </div>
+    </AuthCard>
   )
 }

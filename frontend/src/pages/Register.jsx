@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff, Loader2, Lock, Mail, Phone, User } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { getErrorMessage } from '../utils/errors'
+import AuthCard from '../components/AuthCard'
+import Field from '../components/Field'
 
 export default function Register() {
   const { register } = useAuth()
   const navigate = useNavigate()
 
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
+  const [show, setShow] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -29,65 +33,69 @@ export default function Register() {
     }
   }
 
-  const inputClass =
-    'w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500'
-
   return (
-    <div className="mx-auto max-w-md rounded-xl bg-white p-8 shadow-sm">
-      <h1 className="text-2xl font-bold">Create an account</h1>
-      <p className="mt-1 text-sm text-slate-500">Join CampusFind to report and find items</p>
-
+    <AuthCard
+      title="Create your account"
+      subtitle="Post what you lost or found, and get contacted directly."
+      footer={
+        <>
+          Already have an account?{' '}
+          <Link to="/login" className="font-semibold text-found hover:underline">
+            Log in
+          </Link>
+        </>
+      }
+    >
       {error && (
-        <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" className="mb-4 rounded-xl bg-lost-soft px-4 py-3 text-sm text-lost">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        <div>
-          <label className="mb-1 block text-sm font-medium">Full name</label>
-          <input name="name" value={form.name} onChange={handleChange} required className={inputClass} />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium">Email</label>
-          <input name="email" type="email" value={form.email} onChange={handleChange} required className={inputClass} />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium">Phone</label>
-          <input name="phone" value={form.phone} onChange={handleChange} className={inputClass} />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-sm font-medium">Password</label>
-          <input
-            name="password"
-            type="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            minLength={6}
-            className={inputClass}
-          />
-          <p className="mt-1 text-xs text-slate-500">At least 6 characters</p>
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Field label="Full name" icon={User} name="name" value={form.name} onChange={handleChange} autoComplete="name" required />
+        <Field label="Email" icon={Mail} name="email" type="email" value={form.email} onChange={handleChange} placeholder="you@college.edu" autoComplete="email" required />
+        <Field
+          label="Phone"
+          icon={Phone}
+          name="phone"
+          value={form.phone}
+          onChange={handleChange}
+          autoComplete="tel"
+          hint="Shown only to logged-in students who open your posts."
+        />
+        <Field
+          label="Password"
+          icon={Lock}
+          name="password"
+          type={show ? 'text' : 'password'}
+          value={form.password}
+          onChange={handleChange}
+          autoComplete="new-password"
+          minLength={6}
+          required
+          hint="At least 6 characters."
+          right={
+            <button
+              type="button"
+              onClick={() => setShow(!show)}
+              aria-label={show ? 'Hide password' : 'Show password'}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-ink-soft transition hover:text-ink"
+            >
+              {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          }
+        />
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-indigo-600 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-ink py-3 font-semibold text-white transition hover:bg-found disabled:opacity-60"
         >
-          {loading ? 'Creating account...' : 'Sign up'}
+          {loading && <Loader2 className="size-4 animate-spin" />}
+          {loading ? 'Creating account' : 'Create account'}
         </button>
       </form>
-
-      <p className="mt-4 text-center text-sm text-slate-600">
-        Already have an account?{' '}
-        <Link to="/login" className="font-medium text-indigo-600 hover:underline">
-          Login
-        </Link>
-      </p>
-    </div>
+    </AuthCard>
   )
 }

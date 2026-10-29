@@ -50,7 +50,7 @@ public class ItemService {
 
         return itemRepository.findAll(spec, Sort.by(Sort.Direction.DESC, "createdAt"))
                 .stream()
-                .map(this::toResponse)
+                .map(this::toListResponse)
                 .toList();
     }
 
@@ -180,7 +180,26 @@ public class ItemService {
         item.setImageUrl(request.imageUrl());
         
     }
-
+    
+    private ItemResponse toListResponse(Item item) {
+        return new ItemResponse(
+                item.getId(),
+                item.getTitle(),
+                item.getDescription(),
+                item.getType(),
+                item.getCategory().getId(),
+                item.getCategory().getName(),
+                item.getLocation(),
+                item.getDateReported(),
+                item.getImageUrl(),
+                item.getStatus(),
+                item.getUser().getId(),
+                item.getUser().getName(),
+                null,
+                null,
+                item.getCreatedAt());
+    }
+     
     private ItemResponse toResponse(Item item) {
         return new ItemResponse(
                 item.getId(),
