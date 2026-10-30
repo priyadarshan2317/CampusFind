@@ -6,6 +6,8 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ItemDetails from './pages/ItemDetails'
+import PostItem from './pages/PostItem'
+import MyPosts from './pages/MyPosts'
 
 function App() {
   return (
@@ -21,6 +23,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <ItemDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/items/:id/edit"
+            element={
+              <ProtectedRoute>
+                <PostItem />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/post"
+            element={
+              <ProtectedRoute>
+                <PostItem />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-posts"
+            element={
+              <ProtectedRoute>
+                <MyPosts />
               </ProtectedRoute>
             }
           />

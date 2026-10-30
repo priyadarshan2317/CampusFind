@@ -135,8 +135,16 @@ export default function ItemDetails() {
             </div>
 
             {user?.id === item.postedById ? (
-              <div className="mt-6 rounded-2xl border border-line bg-white p-5 text-sm text-ink-soft">
-                This is your post.
+                            <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-line bg-white p-5 text-sm">
+                <span className="text-ink-soft">This is your post.</span>
+                {item.status !== 'CLAIMED' && (
+                  <Link
+                    to={`/items/${item.id}/edit`}
+                    className="font-semibold text-found hover:underline"
+                  >
+                    Edit post
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="mt-6 rounded-2xl border border-line bg-white p-5">

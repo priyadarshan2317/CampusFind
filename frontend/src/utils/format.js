@@ -2,7 +2,8 @@ import { API_URL } from '../api/axios'
 
 export function imageSrc(url) {
   if (!url) return null
-  return url.startsWith('http') ? url : `${API_URL}${url}`
+  if (url.startsWith('http') || url.startsWith('blob:')) return url
+  return `${API_URL}${url}`
 }
 
 export function formatDate(dateStr) {
