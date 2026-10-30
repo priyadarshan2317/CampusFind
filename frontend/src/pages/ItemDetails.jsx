@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { getErrorMessage } from '../utils/errors'
 import { formatDate, imageSrc, timeAgo } from '../utils/format'
 import CategoryIcon from '../components/CategoryIcon'
+import AdminDeleteButton from '../components/AdminDeleteButton'
 
 const STATUS_NOTE = {
   PENDING: 'Waiting for admin approval. Only you and admins can see this post.',
@@ -176,6 +177,7 @@ export default function ItemDetails() {
                 </p>
               </div>
             )}
+             {user?.role === 'ADMIN' && <AdminDeleteButton id={item.id} />}
           </div>
         </div>
       )}

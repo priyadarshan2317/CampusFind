@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ClipboardList, LogOut, Plus, Tag } from 'lucide-react'
+import { ClipboardList, LogOut, Plus, ShieldCheck, Tag } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const linkClass = ({ isActive }) =>
@@ -36,12 +36,27 @@ export default function Navbar() {
               <NavLink to="/my-posts" className={linkClass}>
                 My posts
               </NavLink>
+              
+            )}
+                        {user?.role === 'ADMIN' && (
+              <NavLink to="/admin" className={linkClass}>
+                Admin
+              </NavLink>
             )}
           </div>
         </div>
 
         {user ? (
           <div className="flex items-center gap-2 sm:gap-3">
+                        {user.role === 'ADMIN' && (
+              <NavLink
+                to="/admin"
+                className={`${linkClass({ isActive: false })} md:hidden`}
+                aria-label="Admin dashboard"
+              >
+                <ShieldCheck className="size-5" />
+              </NavLink>
+            )}
             <NavLink to="/my-posts" className={`${linkClass({ isActive: false })} md:hidden`} aria-label="My posts">
               <ClipboardList className="size-5" />
             </NavLink>
